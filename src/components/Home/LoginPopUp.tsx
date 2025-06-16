@@ -30,7 +30,6 @@ export default function LoginPopUp() {
 
                 // Admin shortcut
                 if (
-                    sessionUser.email === "agananojoshua001@gmail.com" ||
                     sessionUser.email === "squadron0099@gmail.com"
                 ) {
                     navigate("/dashboard", { replace: true });
@@ -61,7 +60,6 @@ export default function LoginPopUp() {
             console.log("User Data:", userData);
 
             if (
-                sessionUser.email === "agananojoshua001@gmail.com" ||
                     sessionUser.email === "squadron0099@gmail.com"
             ) {
                 navigate("/dashboard", { replace: true });
