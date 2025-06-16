@@ -6,6 +6,9 @@ const DID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const CID = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
 const CMID = import.meta.env.VITE_APPWRITE_COLLECTION_ID_MESSAGE;
 
+
+const LIMIT = 100;
+
 export async function saveUserData(data: {
   firstname: string;
   lastname: string;
@@ -30,8 +33,69 @@ export async function sendMessage(data: {
   return await databases.createDocument(DID!, CMID!, ID.unique(), data);
 }
 
+// export const getAllMessages = async () => {
+//   return await databases.listDocuments(DID, CMID);
+// };
+
+// export const getAllMessages = async () => {
+//   const allMessages: any[] = [];
+//   let lastDocId: string | null = null;
+//   let hasMore = true;
+
+//   try {
+//     while (hasMore) {
+//       const queries = [Query.limit(LIMIT)];
+//       if (lastDocId) {
+//         queries.push(Query.cursorAfter(lastDocId));
+//       }
+
+//       const response = await databases.listDocuments(DID, CMID, queries);
+//       allMessages.push(...response.documents);
+
+//       if (response.documents.length < LIMIT) {
+//         hasMore = false;
+//       } else {
+//         lastDocId = response.documents[response.documents.length - 1].$id;
+//       }
+//     }
+
+//     return { documents: allMessages };
+//   } catch (error) {
+//     console.error("Error fetching all messages:", error);
+//     return { documents: [] }; // Always return same shape
+//   }
+// };
+
 export const getAllMessages = async () => {
-  return await databases.listDocuments(DID, CMID);
+  let allDocuments: any[] = [];
+  let lastId: string | null = null;
+  let hasMore = true;
+
+  try {
+    // console.log("Fetching all messages...");
+    while (hasMore) {
+      const queries = [Query.limit(LIMIT)];
+      // console.log(hasMore);
+      if (lastId) queries.push(Query.cursorAfter(lastId));
+      
+      const result = await databases.listDocuments(DID, CMID, queries);
+      // console.log(hasMore, lastId);
+
+      const documents = result.documents;
+      allDocuments = allDocuments.concat(documents);
+
+      if (documents.length < LIMIT) {
+        hasMore = false;
+      } else {
+        lastId = documents[documents.length - 1].$id;
+      }
+    }
+
+    return { documents: allDocuments };
+  } catch (err) {
+    console.error("Error fetching messages:", err);
+    return { documents: [] };
+  }
 };
 
 export const getUserData = async (userId: string) => {
